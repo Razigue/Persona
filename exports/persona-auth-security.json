@@ -1,0 +1,619 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "responseNodes"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [-1312, 592],
+      "id": "d0b9dd34-c807-429c-a2d0-6c5ce2915fdc",
+      "name": "When chat message received",
+      "webhookId": "b5a25918-a16a-41b6-b492-832e49bf5feb"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').first().json.chatInput }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [16, 720],
+      "id": "d94bb8da-85ea-4d11-ad7f-8acb3d0e91f1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "granite3.1-moe:3b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [16, 896],
+      "id": "bc1350ec-c7b6-498a-a1d4-3755ca699604",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "QGcTJYKtjtqN3yGR",
+          "name": "Ollama Real Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.state }}",
+                    "rightValue": "new",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "184beb0e-ca3e-40d5-8d10-8330b310fb41"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0b798062-711b-451a-981e-fc121f353359",
+                    "leftValue": "={{ $json.state }}",
+                    "rightValue": "awaiting_username",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "801cefd0-f0f8-49b1-a7fd-0f632bab0d78",
+                    "leftValue": "={{ $json.state }}",
+                    "rightValue": "awaiting_password",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "8f796902-4523-46a3-b81f-16581a13b987",
+                    "leftValue": "={{ $json.state }}",
+                    "rightValue": "authenticated",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [-272, 400],
+      "id": "5213e0df-4f6c-460d-b10e-36c28069c904",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "collection": "session",
+        "options": {},
+        "query": "={{ JSON.stringify({ sessionId: $('When chat message received').item.json.sessionId }) }}"
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.3,
+      "position": [-1024, 592],
+      "id": "24b253c3-32e3-4542-8016-cc893935c6fb",
+      "name": "Find documents",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mongoDb": {
+          "id": "wFDI3wHaxfdqImEo",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0adf0b5a-b530-4af5-a6da-20fdb64e03a9",
+              "leftValue": "={{ $json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [-768, 608],
+      "id": "5172496e-e3a9-4e98-8beb-fc56f17d55dd",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "collection": "session",
+        "fields": "sessionId,state",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.3,
+      "position": [-384, 912],
+      "id": "2d6db291-abd0-4f38-9e05-ad483fd972f8",
+      "name": "Insert documents",
+      "credentials": {
+        "mongoDb": {
+          "id": "wFDI3wHaxfdqImEo",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"output\": \"Bienvenue ! Vous n'avez pas encore de compte. Entrez votre nom d'utilisateur pour vous inscrire.\" }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [640, 16],
+      "id": "e21457ec-5f5e-44ca-b2fd-8cd701e6b69e",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"output\": \"Nom d'utilisateur enregistré. Entrez votre mot de passe.\" }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [640, 224],
+      "id": "06e844e2-bde8-4d79-a30b-3e0a8ed0fb16",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{ \"output\": \"Votre compte est créé et vous êtes connecté. Vous pouvez maintenant me poser vos questions.\" }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [656, 432],
+      "id": "947e2a36-54ed-421c-83c7-35b679958179",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "session",
+        "updateKey": "sessionId",
+        "fields": "state",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.3,
+      "position": [336, 16],
+      "id": "48b5fd8f-560b-4e4d-9ca7-4417c161ad88",
+      "name": "Update documents",
+      "credentials": {
+        "mongoDb": {
+          "id": "wFDI3wHaxfdqImEo",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "session",
+        "updateKey": "sessionId",
+        "fields": "username,state",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.3,
+      "position": [352, 240],
+      "id": "b04aaec2-137e-4e4e-9089-72584a9b610e",
+      "name": "Update documents1",
+      "credentials": {
+        "mongoDb": {
+          "id": "wFDI3wHaxfdqImEo",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "session",
+        "updateKey": "sessionId",
+        "fields": "password,state",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.3,
+      "position": [368, 528],
+      "id": "f80e960d-ea3b-4941-aebd-74b514420c21",
+      "name": "Update documents2",
+      "credentials": {
+        "mongoDb": {
+          "id": "wFDI3wHaxfdqImEo",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "05850afa-9a78-4354-a8d9-bcb40c57378e",
+              "name": "sessionId",
+              "value": "={{ $('When chat message received').first().json.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "9eabc12d-3b32-437e-955c-81177b1273f9",
+              "name": "state",
+              "value": "new",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-592, 848],
+      "id": "5adc6a73-0d96-454f-a87c-7f11f15d7f08",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8c8e8882-09e6-446d-b259-efd4e5dec5fb",
+              "name": "sessionId",
+              "value": "={{ $('When chat message received').first().json.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "c5a976ad-9acb-4614-aa43-b5b8d81df4ff",
+              "name": "state",
+              "value": "awaiting_username",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [64, 64],
+      "id": "5296cdd8-5f10-4d0a-a278-81c45849a7e0",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "868eb3ae-fffd-4986-941c-0740fbcd5b36",
+              "name": "sessionId",
+              "value": "={{ $('When chat message received').first().json.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "3dcab8d9-ff5c-4584-add5-fc8dff63d86b",
+              "name": "username",
+              "value": "={{ $('When chat message received').first().json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "7e822ac4-399e-49ad-aca7-f9a1416b967d",
+              "name": "state",
+              "value": "awaiting_password",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [96, 320],
+      "id": "788ac5d6-db27-4fe8-87c5-c526acfc1989",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1fb74640-727d-43e2-9125-ae3998c7819f",
+              "name": "sessionId",
+              "value": "={{ $('When chat message received').first().json.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "59738bb0-f044-427e-80a3-e4e55a63ecc9",
+              "name": "password",
+              "value": "={{ $('When chat message received').first().json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "83d4cdbf-0407-43d2-b64a-f6d509bd1fda",
+              "name": "state",
+              "value": "authenticated",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [80, 528],
+      "id": "f6a1812a-cc7b-4393-a450-41116b6eeda5",
+      "name": "Edit Fields3"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Find documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find documents": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert documents": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [[]]
+    },
+    "Respond to Webhook1": {
+      "main": [[]]
+    },
+    "Respond to Webhook2": {
+      "main": [[]]
+    },
+    "Update documents": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update documents1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update documents2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Insert documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Update documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Update documents1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Update documents2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4fa4982b6b6c8515a275afd89c21fa269058ff0caa20cd4a48f3780255899669"
+  }
+}
