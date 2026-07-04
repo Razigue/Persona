@@ -8,7 +8,7 @@
             },
             "type": "@n8n/n8n-nodes-langchain.chatTrigger",
             "typeVersion": 1.4,
-            "position": [-2512, 288],
+            "position": [-2512, 384],
             "id": "0366845e-fd8f-4649-9c0a-0a67a657b722",
             "name": "When chat message received",
             "webhookId": "b5a25918-a16a-41b6-b492-832e49bf5feb"
@@ -21,7 +21,7 @@
             },
             "type": "@n8n/n8n-nodes-langchain.agent",
             "typeVersion": 3.1,
-            "position": [-1168, 784],
+            "position": [-1168, 976],
             "id": "a0a92438-ad47-4166-9b4f-75ffcce8de61",
             "name": "AI Agent"
         },
@@ -32,7 +32,7 @@
             },
             "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
             "typeVersion": 1,
-            "position": [-1088, 1008],
+            "position": [-1088, 1200],
             "id": "e8d4ebd5-88c1-4159-9146-64e19f047789",
             "name": "Ollama Chat Model"
         },
@@ -160,7 +160,7 @@
             },
             "type": "n8n-nodes-base.switch",
             "typeVersion": 3.4,
-            "position": [-1392, 240],
+            "position": [-1392, 336],
             "id": "4249ceb8-9565-4102-8514-0f089421ecbf",
             "name": "Switch1"
         },
@@ -172,7 +172,7 @@
             },
             "type": "n8n-nodes-base.mongoDb",
             "typeVersion": 1.3,
-            "position": [-2288, 288],
+            "position": [-2288, 384],
             "id": "5d7e977c-0b7c-4640-8fc0-c084ed06cf66",
             "name": "Find documents",
             "alwaysOutputData": true,
@@ -210,7 +210,7 @@
             },
             "type": "n8n-nodes-base.if",
             "typeVersion": 2.3,
-            "position": [-2064, 288],
+            "position": [-2064, 384],
             "id": "bd40e99d-d05c-4f9f-96de-6e37328b1d9c",
             "name": "If"
         },
@@ -223,7 +223,7 @@
             },
             "type": "n8n-nodes-base.mongoDb",
             "typeVersion": 1.3,
-            "position": [-1616, 368],
+            "position": [-1616, 464],
             "id": "cc8d69f3-346a-4f29-98c1-1ef967c4c3a3",
             "name": "Insert documents",
             "credentials": {
@@ -265,7 +265,7 @@
             },
             "type": "n8n-nodes-base.respondToWebhook",
             "typeVersion": 1.5,
-            "position": [-368, 288],
+            "position": [272, 288],
             "id": "07b8bb8b-aaa0-488a-baa0-c55d9edc6a84",
             "name": "Respond to Webhook2"
         },
@@ -319,7 +319,7 @@
             },
             "type": "n8n-nodes-base.mongoDb",
             "typeVersion": 1.3,
-            "position": [-592, 288],
+            "position": [48, 288],
             "id": "f2d55ed9-4b2c-4c60-bd66-f68588de1245",
             "name": "Update documents2",
             "credentials": {
@@ -351,7 +351,7 @@
             },
             "type": "n8n-nodes-base.set",
             "typeVersion": 3.4,
-            "position": [-1840, 368],
+            "position": [-1840, 464],
             "id": "ecbe2582-c8fc-4cf3-b774-420fcab76ebc",
             "name": "Edit Fields"
         },
@@ -426,13 +426,7 @@
                         {
                             "id": "59738bb0-f044-427e-80a3-e4e55a63ecc9",
                             "name": "password",
-                            "value": "={{ $('When chat message received').first().json.chatInput }}",
-                            "type": "string"
-                        },
-                        {
-                            "id": "83d4cdbf-0407-43d2-b64a-f6d509bd1fda",
-                            "name": "state",
-                            "value": "authenticated",
+                            "value": "={{ $('When chat message received').first().json.chatInput + $json.data }}",
                             "type": "string"
                         }
                     ]
@@ -441,7 +435,7 @@
             },
             "type": "n8n-nodes-base.set",
             "typeVersion": 3.4,
-            "position": [-816, 288],
+            "position": [-816, 384],
             "id": "d4380af9-1450-439f-9d7c-743e23ff4f11",
             "name": "Edit Fields3"
         },
@@ -488,6 +482,7 @@
             "position": [-1104, 0],
             "id": "780f17ef-6c13-43dc-8448-43761912c9b5",
             "name": "Find documents1",
+            "alwaysOutputData": true,
             "credentials": {
                 "mongoDb": {
                     "id": "sFoDtMwVAu42mHWX",
@@ -531,11 +526,11 @@
             "parameters": {
                 "collection": "session",
                 "options": {},
-                "query": "={{ JSON.stringify ({ username : $('Switch1').first().json.username, password: $('When chat message received').first().json.chatInput }) }}"
+                "query": "={{ JSON.stringify ({ username : $('Switch1').first().json.username })}}"
             },
             "type": "n8n-nodes-base.mongoDb",
             "typeVersion": 1.3,
-            "position": [-1104, 288],
+            "position": [-1104, 384],
             "id": "1bd6ccf9-f246-4d12-bb00-5a1a83af7c62",
             "name": "Find documents2",
             "credentials": {
@@ -579,7 +574,7 @@
             },
             "type": "n8n-nodes-base.set",
             "typeVersion": 3.4,
-            "position": [-1104, 480],
+            "position": [-1104, 672],
             "id": "9a05dd52-4a17-434f-9ed1-900fcb1638c2",
             "name": "Edit Fields5"
         },
@@ -625,7 +620,7 @@
             },
             "type": "n8n-nodes-base.mongoDb",
             "typeVersion": 1.3,
-            "position": [-592, 480],
+            "position": [80, 672],
             "id": "e0a1c041-3f33-4e3f-af09-e3bbd837768f",
             "name": "Update documents4",
             "credentials": {
@@ -643,7 +638,7 @@
             },
             "type": "n8n-nodes-base.respondToWebhook",
             "typeVersion": 1.5,
-            "position": [-368, 480],
+            "position": [304, 672],
             "id": "8ca962a5-3e91-4596-8388-2760633cf8eb",
             "name": "Respond to Webhook4"
         },
@@ -651,12 +646,12 @@
             "parameters": {
                 "operation": "insert",
                 "collection": "session",
-                "fields": "username, password",
+                "fields": "username, password, sessionId, data",
                 "options": {}
             },
             "type": "n8n-nodes-base.mongoDb",
             "typeVersion": 1.3,
-            "position": [-816, 480],
+            "position": [-144, 672],
             "id": "8d40ae8c-5ad6-4c32-9462-3d8811ee1b95",
             "name": "Insert documents1",
             "credentials": {
@@ -665,6 +660,168 @@
                     "name": "MongoDB account"
                 }
             }
+        },
+        {
+            "parameters": {
+                "action": "generate",
+                "encodingType": "hex",
+                "stringLength": 16
+            },
+            "type": "n8n-nodes-base.crypto",
+            "typeVersion": 2,
+            "position": [-816, 672],
+            "id": "e879baf6-e641-4609-9dea-a5ff1850e491",
+            "name": "Crypto"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "83339b95-4656-4f9d-9ad0-d182fbd0a201",
+                            "name": "hash",
+                            "value": "=$json.password + $json.data",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [-592, 672],
+            "id": "f248b773-a279-4183-937f-4a1908160983",
+            "name": "Edit Fields6"
+        },
+        {
+            "parameters": {
+                "value": "=$json.hash",
+                "dataPropertyName": "password"
+            },
+            "type": "n8n-nodes-base.crypto",
+            "typeVersion": 2,
+            "position": [-368, 672],
+            "id": "ec89395a-2bf2-4deb-ad7c-7e3f1f44cce1",
+            "name": "Crypto1"
+        },
+        {
+            "parameters": {
+                "value": "=$json.password",
+                "dataPropertyName": "password"
+            },
+            "type": "n8n-nodes-base.crypto",
+            "typeVersion": 2,
+            "position": [-592, 384],
+            "id": "7d62229f-c8b5-494c-98f5-9d382b5ac419",
+            "name": "Crypto2"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 3
+                    },
+                    "conditions": [
+                        {
+                            "id": "ec6337c9-075f-4e84-90bd-16b118ed10da",
+                            "leftValue": "=$('Find documents2').item.json.password",
+                            "rightValue": "=$json.password",
+                            "operator": {
+                                "type": "string",
+                                "operation": "equals"
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.3,
+            "position": [-368, 384],
+            "id": "5cc151fe-2eb6-4092-aaee-145fb4b11d79",
+            "name": "If2"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "52e5fe9d-5fd7-47da-80bd-fbd34c25c440",
+                            "name": "state",
+                            "value": "awaiting_password_login",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [-144, 480],
+            "id": "16eca0ed-8c74-4b22-a61c-9a6a1a71f982",
+            "name": "Edit Fields7"
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "collection": "session",
+                "updateKey": "sessionId",
+                "fields": "password, state",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.mongoDb",
+            "typeVersion": 1.3,
+            "position": [80, 480],
+            "id": "cd9a5f05-4ab3-4a88-8716-7920f3603b6a",
+            "name": "Update documents5",
+            "credentials": {
+                "mongoDb": {
+                    "id": "sFoDtMwVAu42mHWX",
+                    "name": "MongoDB account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "{ \"output\": \"L'username ou le password est incorrect, veuillez ré-essayer.\" }",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.5,
+            "position": [288, 480],
+            "id": "764cfe3c-1320-41b1-86c2-27c00f47ecca",
+            "name": "Respond to Webhook5"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "0621e855-d66d-4ab6-bf12-b3e00d235432",
+                            "name": "state",
+                            "value": "authenticated",
+                            "type": "string"
+                        },
+                        {
+                            "id": "b6f914fc-5fa5-4cdc-8258-b6cc0e52ec6e",
+                            "name": "password",
+                            "value": "=$json.password",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [-144, 304],
+            "id": "2f26260f-9ae2-45c7-90cb-abf858364dfd",
+            "name": "Edit Fields8"
         }
     ],
     "connections": {
@@ -839,7 +996,7 @@
             "main": [
                 [
                     {
-                        "node": "Update documents2",
+                        "node": "Crypto2",
                         "type": "main",
                         "index": 0
                     }
@@ -901,7 +1058,7 @@
             "main": [
                 [
                     {
-                        "node": "Insert documents1",
+                        "node": "Crypto",
                         "type": "main",
                         "index": 0
                     }
@@ -935,6 +1092,101 @@
                 [
                     {
                         "node": "Update documents4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Crypto": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields6",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields6": {
+            "main": [
+                [
+                    {
+                        "node": "Crypto1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Crypto1": {
+            "main": [
+                [
+                    {
+                        "node": "Insert documents1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Crypto2": {
+            "main": [
+                [
+                    {
+                        "node": "If2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "If2": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields8",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Edit Fields7",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields7": {
+            "main": [
+                [
+                    {
+                        "node": "Update documents5",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Update documents5": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook5",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields8": {
+            "main": [
+                [
+                    {
+                        "node": "Update documents2",
                         "type": "main",
                         "index": 0
                     }
