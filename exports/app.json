@@ -34,7 +34,13 @@
             "typeVersion": 1,
             "position": [736, 1184],
             "id": "0127bc62-9c9a-440b-ad61-e8102194258d",
-            "name": "Ollama Chat Model"
+            "name": "Ollama Chat Model",
+            "credentials": {
+                "ollamaApi": {
+                    "id": "ZEFEFW4Gz6HeK73O",
+                    "name": "Ollama account 2"
+                }
+            }
         },
         {
             "parameters": {
@@ -602,7 +608,8 @@
                     "id": "sFoDtMwVAu42mHWX",
                     "name": "MongoDB account"
                 }
-            }
+            },
+            "alwaysOutputData": true
         },
         {
             "parameters": {
@@ -618,26 +625,6 @@
         },
         {
             "parameters": {
-                "operation": "update",
-                "collection": "session",
-                "updateKey": "sessionId",
-                "fields": "password, state",
-                "options": {}
-            },
-            "type": "n8n-nodes-base.mongoDb",
-            "typeVersion": 1.3,
-            "position": [1904, 656],
-            "id": "37754730-a9f4-4e1f-af70-3908d112f251",
-            "name": "Update documents4",
-            "credentials": {
-                "mongoDb": {
-                    "id": "sFoDtMwVAu42mHWX",
-                    "name": "MongoDB account"
-                }
-            }
-        },
-        {
-            "parameters": {
                 "respondWith": "json",
                 "responseBody": "{ \"output\": \"Première connexion réussie, bienvenue.\" }",
                 "options": {}
@@ -650,10 +637,11 @@
         },
         {
             "parameters": {
-                "operation": "insert",
+                "operation": "update",
                 "collection": "session",
-                "fields": "username, password, sessionId, data, subscribed",
-                "options": {}
+                "fields": "username, password, data, subscribed, state",
+                "options": {},
+                "updateKey": "sessionId"
             },
             "type": "n8n-nodes-base.mongoDb",
             "typeVersion": 1.3,
@@ -691,7 +679,8 @@
                         }
                     ]
                 },
-                "options": {}
+                "options": {},
+                "includeOtherFields": true
             },
             "type": "n8n-nodes-base.set",
             "typeVersion": 3.4,
@@ -760,6 +749,12 @@
                             "name": "state",
                             "value": "awaiting_password_login",
                             "type": "string"
+                        },
+                        {
+                            "id": "42b0e0a1-2276-43c9-88ee-3c1880ce8f92",
+                            "name": "sessionId",
+                            "value": "={{ $('When chat message received').first().json.sessionId }}",
+                            "type": "string"
                         }
                     ]
                 },
@@ -776,7 +771,7 @@
                 "operation": "update",
                 "collection": "session",
                 "updateKey": "sessionId",
-                "fields": "password, state",
+                "fields": "state",
                 "options": {}
             },
             "type": "n8n-nodes-base.mongoDb",
@@ -831,14 +826,38 @@
         },
         {
             "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours"
+                        }
+                    ]
+                }
+            },
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.3,
+            "position": [-700, 2100],
+            "id": "709d780c-0b29-4e3e-b2a6-a18bfb4b89fe",
+            "name": "NL Schedule"
+        },
+        {
+            "parameters": {},
+            "type": "n8n-nodes-base.manualTrigger",
+            "typeVersion": 1,
+            "position": [-700, 2320],
+            "id": "8a12e950-d860-4d88-ab12-06d486156f55",
+            "name": "NL Manual"
+        },
+        {
+            "parameters": {
                 "url": "https://www.theguardian.com/environment/climate-crisis/rss",
                 "options": {}
             },
             "type": "n8n-nodes-base.rssFeedRead",
             "typeVersion": 1.2,
-            "position": [192, 1712],
-            "id": "c0c05844-fadd-426d-9ac5-2f9e4d249b63",
-            "name": "RSS Read"
+            "position": [-460, 2000],
+            "id": "8c44e51e-8710-4eb0-8378-fe1dce8bab2d",
+            "name": "NL RSS Guardian"
         },
         {
             "parameters": {
@@ -847,9 +866,9 @@
             },
             "type": "n8n-nodes-base.rssFeedRead",
             "typeVersion": 1.2,
-            "position": [400, 1712],
-            "id": "88fdef6c-0067-40ef-8848-fffb2a8eb5ea",
-            "name": "RSS Read1"
+            "position": [-460, 2200],
+            "id": "4fd7951b-be6b-47c4-91bc-a7c27d519d52",
+            "name": "NL RSS Grist"
         },
         {
             "parameters": {
@@ -858,9 +877,9 @@
             },
             "type": "n8n-nodes-base.rssFeedRead",
             "typeVersion": 1.2,
-            "position": [608, 1712],
-            "id": "bd255dc4-151e-4432-ae55-71e74e93274c",
-            "name": "RSS Read2"
+            "position": [-460, 2400],
+            "id": "7065de42-9e85-4df8-9fef-7aefee032000",
+            "name": "NL RSS Inside"
         },
         {
             "parameters": {
@@ -868,9 +887,47 @@
             },
             "type": "n8n-nodes-base.merge",
             "typeVersion": 3.2,
-            "position": [816, 1712],
-            "id": "7bf5b3a5-7043-4c75-95c9-09e8c0bdb00a",
-            "name": "Merge"
+            "position": [-240, 2200],
+            "id": "9b76b8ea-0a33-4190-9e99-93b35b713ef9",
+            "name": "NL Merge"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "7181fbb9-85cd-48ae-8a27-f5d3b3c30627",
+                            "name": "title",
+                            "value": "={{ $json.title }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "e3523a34-7ad7-4982-a829-4b9ab3e6a5f8",
+                            "name": "link",
+                            "value": "={{ $json.link }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "22697ff3-2e3e-4f91-9094-dc67d98690f3",
+                            "name": "snippet",
+                            "value": "={{ ($json.contentSnippet || $json.content || '').slice(0, 200) }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "d2195ae3-1cb0-430c-8221-e4b6480540cd",
+                            "name": "date",
+                            "value": "={{ $json.isoDate || $json.pubDate }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [-20, 2200],
+            "id": "eb9f15e2-e636-4e35-b563-f9d0269cd0ce",
+            "name": "NL Normalize"
         },
         {
             "parameters": {
@@ -880,9 +937,9 @@
             },
             "type": "n8n-nodes-base.removeDuplicates",
             "typeVersion": 2,
-            "position": [1200, 1712],
-            "id": "a023b0e0-d08b-44fd-bb32-9ee1166d84b9",
-            "name": "Remove Duplicates"
+            "position": [200, 2200],
+            "id": "01988211-40f7-4046-8a66-1e190cc22bfa",
+            "name": "NL Dedupe"
         },
         {
             "parameters": {
@@ -911,71 +968,42 @@
             },
             "type": "n8n-nodes-base.filter",
             "typeVersion": 2.3,
-            "position": [1408, 1712],
-            "id": "7ec43ab4-7cea-41b9-ac79-e5d315d0a3f0",
-            "name": "Filter"
+            "position": [420, 2200],
+            "id": "c4b057fa-381d-409c-967e-af45ca26abdb",
+            "name": "NL Filter Recent"
         },
         {
             "parameters": {
-                "assignments": {
-                    "assignments": [
-                        {
-                            "id": "7181fbb9-85cd-48ae-8a27-f5d3b3c30627",
-                            "name": "title",
-                            "value": "={{ $json.title }}",
-                            "type": "string"
-                        },
-                        {
-                            "id": "e3523a34-7ad7-4982-a829-4b9ab3e6a5f8",
-                            "name": "link",
-                            "value": "={{ $json.link }}",
-                            "type": "string"
-                        },
-                        {
-                            "id": "cd8debae-3cd6-4f31-85a5-f4744e79cb30",
-                            "name": "content",
-                            "value": "={{ $json.contentSnippet || $json.content }}",
-                            "type": "string"
-                        },
-                        {
-                            "id": "d7e5beb7-8ec0-4dee-a5e8-0c2f4729c9d2",
-                            "name": "date",
-                            "value": "={{ $json.isoDate || $json.pubDate }}",
-                            "type": "string"
-                        }
-                    ]
-                },
+                "maxItems": 5
+            },
+            "type": "n8n-nodes-base.limit",
+            "typeVersion": 1,
+            "position": [640, 2200],
+            "id": "e056dca3-f65b-4d37-9d6e-0b5177a465b2",
+            "name": "NL Limit"
+        },
+        {
+            "parameters": {
+                "aggregate": "aggregateAllItemData",
                 "options": {}
             },
-            "type": "n8n-nodes-base.set",
-            "typeVersion": 3.4,
-            "position": [1024, 1712],
-            "id": "c4c6064c-e98b-4763-b011-1f16ee6b7b04",
-            "name": "Edit Fields9"
-        },
-        {
-            "parameters": {
-                "rule": {
-                    "interval": [{}]
-                }
-            },
-            "type": "n8n-nodes-base.scheduleTrigger",
-            "typeVersion": 1.3,
-            "position": [16, 1712],
-            "id": "2534b914-10dd-48cb-94d1-ea2ef53504d9",
-            "name": "Schedule Trigger"
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [860, 2200],
+            "id": "384fa969-d9dc-4721-8349-243c7bccfa99",
+            "name": "NL Aggregate"
         },
         {
             "parameters": {
                 "collection": "session",
                 "options": {},
-                "query": "={ \"subscribed\": true}"
+                "query": "={ \"subscribed\": true }"
             },
             "type": "n8n-nodes-base.mongoDb",
-            "typeVersion": 1.3,
-            "position": [192, 1888],
-            "id": "be9f5da6-f54d-4aed-b008-bbb1e113595b",
-            "name": "Find documents3",
+            "typeVersion": 1.1,
+            "position": [1080, 2200],
+            "id": "02a9ba62-3c75-4b3e-9ded-b59298e00ff8",
+            "name": "NL Find Subscribers",
             "credentials": {
                 "mongoDb": {
                     "id": "sFoDtMwVAu42mHWX",
@@ -989,14 +1017,14 @@
                     "options": {
                         "caseSensitive": true,
                         "leftValue": "",
-                        "typeValidation": "strict",
+                        "typeValidation": "loose",
                         "version": 3
                     },
                     "conditions": [
                         {
-                            "id": "b4df852b-d04e-4940-bdeb-23b8a0b28622",
-                            "leftValue": "={{ new Date($json.lastSentAt) <= $now.minus({ days: $json.frequency}).toJSDate() }}",
-                            "rightValue": "=",
+                            "id": "8ed677ff-81a1-42ea-8c44-e2b8184880b2",
+                            "leftValue": "={{ new Date($json.lastSentAt || 0) <= $now.minus({ days: ($json.frequency || 1) }).toJSDate() }}",
+                            "rightValue": "",
                             "operator": {
                                 "type": "boolean",
                                 "operation": "true",
@@ -1009,25 +1037,67 @@
                 "options": {}
             },
             "type": "n8n-nodes-base.filter",
-            "typeVersion": 2.3,
-            "position": [432, 1888],
-            "id": "8f77cb36-53b0-46a6-93f7-42bc8161fc52",
-            "name": "Filter1"
+            "typeVersion": 2.2,
+            "position": [1300, 2200],
+            "id": "63e5e1d9-0433-4ed2-9ab3-a175f703d30a",
+            "name": "NL Filter Due"
+        },
+        {
+            "parameters": {
+                "promptType": "=define",
+                "text": "=Tu es un curateur de veille climatique. Le lecteur s'intéresse à : {{ $json.interests }}\n\nVoici les articles du jour au format JSON :\n{{ JSON.stringify($('NL Aggregate').first().json.data) }}\n\nSélectionne les 5 articles les plus pertinents pour ce lecteur.\n\nRéponds UNIQUEMENT avec un tableau JSON valide, sans texte avant ou après, sans balises markdown, au format exact :\n[{\"title\": \"titre de l'article\", \"link\": \"url exacte fournie\", \"summary\": \"résumé en une phrase courte (20 mots maximum)\"}]\n\nImportant : recopie les liens exactement tels qu'ils sont fournis, ne les modifie jamais. N'invente aucun article.",
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.9,
+            "position": [1560, 2200],
+            "id": "97b24125-be8a-4c7a-8751-488ed9dc9474",
+            "name": "NL LLM Curate"
+        },
+        {
+            "parameters": {
+                "jsCode": "const users = $('NL Filter Due').all();\nconst results = [];\nlet i = 0;\n\nfor (const item of $input.all()) {\n  const raw = item.json.text || \"\";\n  let clean = raw.replace(/```json/g, \"\").replace(/```/g, \"\").trim();\n\n  // keep only from first [ to last ]\n  const start = clean.indexOf(\"[\");\n  const end = clean.lastIndexOf(\"]\");\n  if (start !== -1 && end !== -1 && end > start) {\n    clean = clean.slice(start, end + 1);\n  } else if (start !== -1) {\n    clean = clean.slice(start);\n  }\n\n  let articles = null;\n  try {\n    articles = JSON.parse(clean);\n  } catch (e) {\n    // fallback: truncated JSON -> close after last complete object\n    const lastBrace = clean.lastIndexOf(\"}\");\n    if (lastBrace !== -1) {\n      try {\n        articles = JSON.parse(clean.slice(0, lastBrace + 1) + \"]\");\n      } catch (e2) {\n        articles = null;\n      }\n    }\n  }\n\n  // skip this user if LLM output is unusable (don't crash the others)\n  if (!articles || !Array.isArray(articles) || articles.length === 0) {\n    i++;\n    continue;\n  }\n\n  const articlesHtml = articles.map(a =>\n    \"<div style='margin-bottom:20px'>\"\n    + \"<h3 style='margin-bottom:4px'>\" + (a.title || \"\") + \"</h3>\"\n    + \"<p style='margin:4px 0'>\" + (a.summary || \"\") + \"</p>\"\n    + \"<a href='\" + (a.link || \"#\") + \"'>Lire l'article</a>\"\n    + \"</div>\"\n  ).join(\"\");\n\n  const html = \"<h1>Votre veille climat du jour</h1>\"\n    + articlesHtml\n    + \"<hr>\"\n    + \"<p style='color:gray;font-size:12px'>Vous recevez cet email car vous êtes inscrit à Persona. \"\n    + \"<a href='http://localhost:5678/form/7563b672-5325-4bad-a636-391f23f2eb61'>Cliquez ici pour vous désabonner</a>.</p>\";\n\n  results.push({\n    json: {\n      html: html,\n      email: users[i] ? users[i].json.email : undefined,\n      sessionId: users[i] ? users[i].json.sessionId : undefined\n    }\n  });\n\n  i++;\n}\n\nreturn results;"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [1780, 2200],
+            "id": "b71066be-4c3d-4d9f-b067-5fff05ec7bdf",
+            "name": "NL Format HTML"
+        },
+        {
+            "parameters": {
+                "fromEmail": "razigue.benhmida@epitech.eu",
+                "toEmail": "={{ $json.email }}",
+                "subject": "=Persona · Votre veille du {{ $now.format('dd/MM') }}",
+                "html": "={{ $json.html }}",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.emailSend",
+            "typeVersion": 2.1,
+            "position": [2000, 2200],
+            "id": "0f797c49-7092-4e8c-8582-45c712c06926",
+            "name": "NL Send Email",
+            "credentials": {
+                "smtp": {
+                    "id": "YiI36cS4BdBeSxjK",
+                    "name": "SMTP account"
+                }
+            }
         },
         {
             "parameters": {
                 "assignments": {
                     "assignments": [
                         {
-                            "id": "b0df4681-9537-4933-baad-075d0378b65f",
-                            "name": "articles",
-                            "value": "=$('Filter').all().map(a => ({title: a.json.title, link: a.json.link, content: a.json.content}))",
-                            "type": "array"
+                            "id": "d29527ee-9609-4731-ab60-225d6b979131",
+                            "name": "sessionId",
+                            "value": "={{ $json.sessionId }}",
+                            "type": "string"
                         },
                         {
-                            "id": "8c41edf4-963a-4efd-91d1-ce0b0e19a7e3",
-                            "name": "sessionId",
-                            "value": "$json.sessionId",
+                            "id": "127529ce-eed5-4754-86e4-bec6190d1a38",
+                            "name": "lastSentAt",
+                            "value": "={{ $now.toISO() }}",
                             "type": "string"
                         }
                     ]
@@ -1036,28 +1106,50 @@
             },
             "type": "n8n-nodes-base.set",
             "typeVersion": 3.4,
-            "position": [688, 1904],
-            "id": "927246a3-116c-4edb-9a7d-f19f0961b01d",
-            "name": "Edit Fields10"
+            "position": [2000, 2400],
+            "id": "34f6beba-b47d-4c62-b7a7-b18b6d8f7569",
+            "name": "NL Stamp Date"
         },
         {
             "parameters": {
-                "fromEmail": "=razigue.benhmida@epitech.eu",
-                "toEmail": "={{  $json.email }}",
-                "subject": "Your mail",
-                "html": "=$json.articles.map(a => `<a href=\"${a.link}\">${a.title}</a><p>${a.content}</p>`).join()",
+                "operation": "update",
+                "collection": "session",
+                "updateKey": "sessionId",
+                "fields": "sessionId, lastSentAt",
                 "options": {}
             },
-            "type": "n8n-nodes-base.emailSend",
-            "typeVersion": 2.1,
-            "position": [960, 1904],
-            "id": "ee45b873-0c4a-42c3-b42b-813118a0ab69",
-            "name": "Send an Email",
-            "webhookId": "a8c3aa0d-6469-4788-8304-3f0f074658b8",
+            "type": "n8n-nodes-base.mongoDb",
+            "typeVersion": 1.1,
+            "position": [2220, 2200],
+            "id": "fe28ef8d-3478-45d7-acf1-ede331076726",
+            "name": "NL Mark Sent",
             "credentials": {
-                "smtp": {
-                    "id": "YiI36cS4BdBeSxjK",
-                    "name": "SMTP account"
+                "mongoDb": {
+                    "id": "sFoDtMwVAu42mHWX",
+                    "name": "MongoDB account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "value": "llama-3.1-8b-instant",
+                    "mode": "list",
+                    "cachedResultName": "llama-3.1-8b-instant"
+                },
+                "builtInTools": {},
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+            "typeVersion": 1.3,
+            "position": [1560, 2420],
+            "id": "97aef9e6-20dc-432d-8e6f-319ee22e824f",
+            "name": "NL OpenAI Model",
+            "credentials": {
+                "openAiApi": {
+                    "id": "aXa9m6XTanqETuAs",
+                    "name": "OpenAI account"
                 }
             }
         }
@@ -1314,22 +1406,11 @@
                 ]
             ]
         },
-        "Update documents4": {
-            "main": [
-                [
-                    {
-                        "node": "Respond to Webhook4",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
         "Insert documents1": {
             "main": [
                 [
                     {
-                        "node": "Update documents4",
+                        "node": "Respond to Webhook4",
                         "type": "main",
                         "index": 0
                     }
@@ -1431,116 +1512,219 @@
                 ]
             ]
         },
-        "RSS Read": {
+        "NL Schedule": {
             "main": [
                 [
                     {
-                        "node": "RSS Read1",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "RSS Read1": {
-            "main": [
-                [
-                    {
-                        "node": "RSS Read2",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "RSS Read2": {
-            "main": [
-                [
-                    {
-                        "node": "Merge",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Merge": {
-            "main": [
-                [
-                    {
-                        "node": "Edit Fields9",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Remove Duplicates": {
-            "main": [
-                [
-                    {
-                        "node": "Filter",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Edit Fields9": {
-            "main": [
-                [
-                    {
-                        "node": "Remove Duplicates",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Schedule Trigger": {
-            "main": [
-                [
-                    {
-                        "node": "RSS Read",
+                        "node": "NL RSS Guardian",
                         "type": "main",
                         "index": 0
                     },
                     {
-                        "node": "Find documents3",
+                        "node": "NL RSS Grist",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "NL RSS Inside",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Find documents3": {
+        "NL Manual": {
             "main": [
                 [
                     {
-                        "node": "Filter1",
+                        "node": "NL RSS Guardian",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "NL RSS Grist",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "NL RSS Inside",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Filter1": {
+        "NL RSS Guardian": {
             "main": [
                 [
                     {
-                        "node": "Edit Fields10",
+                        "node": "NL Merge",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "Edit Fields10": {
+        "NL RSS Grist": {
             "main": [
                 [
                     {
-                        "node": "Send an Email",
+                        "node": "NL Merge",
                         "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "NL RSS Inside": {
+            "main": [
+                [
+                    {
+                        "node": "NL Merge",
+                        "type": "main",
+                        "index": 2
+                    }
+                ]
+            ]
+        },
+        "NL Merge": {
+            "main": [
+                [
+                    {
+                        "node": "NL Normalize",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Normalize": {
+            "main": [
+                [
+                    {
+                        "node": "NL Dedupe",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Dedupe": {
+            "main": [
+                [
+                    {
+                        "node": "NL Filter Recent",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Filter Recent": {
+            "main": [
+                [
+                    {
+                        "node": "NL Limit",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Limit": {
+            "main": [
+                [
+                    {
+                        "node": "NL Aggregate",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Aggregate": {
+            "main": [
+                [
+                    {
+                        "node": "NL Find Subscribers",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Find Subscribers": {
+            "main": [
+                [
+                    {
+                        "node": "NL Filter Due",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Filter Due": {
+            "main": [
+                [
+                    {
+                        "node": "NL LLM Curate",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL LLM Curate": {
+            "main": [
+                [
+                    {
+                        "node": "NL Format HTML",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Format HTML": {
+            "main": [
+                [
+                    {
+                        "node": "NL Send Email",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Send Email": {
+            "main": [
+                [
+                    {
+                        "node": "NL Stamp Date",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Stamp Date": {
+            "main": [
+                [
+                    {
+                        "node": "NL Mark Sent",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL OpenAI Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "NL LLM Curate",
+                        "type": "ai_languageModel",
                         "index": 0
                     }
                 ]
