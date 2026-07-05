@@ -1,0 +1,867 @@
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        192
+      ],
+      "id": "3c4bed59-d4e3-4f9f-9c02-0695c4f0755c",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://www.theguardian.com/environment/climate-crisis/rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "5e29d353-105d-4731-925a-d35bcf53d26f",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "url": "https://grist.org/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "47ad54f8-7c95-411b-ae8c-9defc6dd2c3a",
+      "name": "RSS Read1"
+    },
+    {
+      "parameters": {
+        "url": "https://insideclimatenews.org/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "c737ed01-4999-4c79-bff0-5aaf77e6fda4",
+      "name": "RSS Read2"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        832,
+        0
+      ],
+      "id": "fb964c71-d41e-4822-bd23-d47cb68cd8fa",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7181fbb9-85cd-48ae-8a27-f5d3b3c30627",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "e3523a34-7ad7-4982-a829-4b9ab3e6a5f8",
+              "name": "link",
+              "value": "={{ $json.link }}",
+              "type": "string"
+            },
+            {
+              "id": "22697ff3-2e3e-4f91-9094-dc67d98690f3",
+              "name": "snippet",
+              "value": "={{ ($json.contentSnippet || $json.content || '').slice(0, 200) }}",
+              "type": "string"
+            },
+            {
+              "id": "d2195ae3-1cb0-430c-8221-e4b6480540cd",
+              "name": "date",
+              "value": "={{ $json.isoDate || $json.pubDate }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "d0784643-2bc9-4abe-8173-94005823be74",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "link",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        0
+      ],
+      "id": "55279b8c-e98e-409d-bea1-9b5c7516fc22",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b4df852b-d04e-4940-bdeb-23b8a0b28622",
+              "leftValue": "={{ new Date($json.date) > $now.minus({ days: 7 }).toJSDate() }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        1424,
+        0
+      ],
+      "id": "92790f85-02e1-4371-973c-6686a6282d4c",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "maxItems": 5
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1632,
+        0
+      ],
+      "id": "6ee8f6c6-cb88-481b-b73b-6607c4eafd22",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        0
+      ],
+      "id": "88628916-7186-4811-8048-5110bd6d4ceb",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "promptType": "=define",
+        "text": "=Tu es un curateur de veille climatique. Le lecteur s'intéresse à : {{ $json.interests }}\n\nVoici les articles du jour au format JSON :\n{{ JSON.stringify($('Aggregate').first().json.data) }}\n\nSélectionne les 5 articles les plus pertinents pour ce lecteur.\n\nRéponds UNIQUEMENT avec un tableau JSON valide, sans texte avant ou après, sans balises markdown, au format exact :\n[{\"title\": \"titre de l'article\", \"link\": \"url exacte fournie\", \"summary\": \"résumé en une phrase courte (20 mots maximum)\"}]\n\nImportant : recopie les liens exactement tels qu'ils sont fournis, ne les modifie jamais. N'invente aucun article.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        2464,
+        0
+      ],
+      "id": "829a5191-5027-4241-987d-a21599f9d3f3",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "jsCode": "const users = $('Filter1').all();\nconst results = [];\nlet i = 0;\n\nfor (const item of $input.all()) {\n  const raw = item.json.text || \"\";\n  let clean = raw.replace(/```json/g, \"\").replace(/```/g, \"\").trim();\n\n  // keep only from first [ to last ]\n  const start = clean.indexOf(\"[\");\n  const end = clean.lastIndexOf(\"]\");\n  if (start !== -1 && end !== -1 && end > start) {\n    clean = clean.slice(start, end + 1);\n  } else if (start !== -1) {\n    clean = clean.slice(start);\n  }\n\n  let articles = null;\n  try {\n    articles = JSON.parse(clean);\n  } catch (e) {\n    // fallback: truncated JSON -> close after last complete object\n    const lastBrace = clean.lastIndexOf(\"}\");\n    if (lastBrace !== -1) {\n      try {\n        articles = JSON.parse(clean.slice(0, lastBrace + 1) + \"]\");\n      } catch (e2) {\n        articles = null;\n      }\n    }\n  }\n\n  // skip this user if LLM output is unusable (don't crash the others)\n  if (!articles || !Array.isArray(articles) || articles.length === 0) {\n    i++;\n    continue;\n  }\n\n  const articlesHtml = articles.map(a =>\n    \"<div style='margin-bottom:20px'>\"\n    + \"<h3 style='margin-bottom:4px'>\" + (a.title || \"\") + \"</h3>\"\n    + \"<p style='margin:4px 0'>\" + (a.summary || \"\") + \"</p>\"\n    + \"<a href='\" + (a.link || \"#\") + \"'>Lire l'article</a>\"\n    + \"</div>\"\n  ).join(\"\");\n\n  const html = \"<h1>Votre veille climat du jour</h1>\"\n    + articlesHtml\n    + \"<hr>\"\n    + \"<p style='color:gray;font-size:12px'>Vous recevez cet email car vous êtes inscrit à Persona. \"\n    + \"<a href='http://localhost:5678/form/7563b672-5325-4bad-a636-391f23f2eb61'>Cliquez ici pour vous désabonner</a>.</p>\";\n\n  results.push({\n    json: {\n      html: html,\n      email: users[i] ? users[i].json.email : undefined\n    }\n  });\n\n  i++;\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2784,
+        0
+      ],
+      "id": "9b70f9e2-7ad8-4835-b970-dc2e659a634a",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "=Persona · Votre veille du {{ $now.format('dd/MM') }}",
+        "message": "={{ $json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2992,
+        0
+      ],
+      "id": "4d93017a-8b4b-44b8-bc29-18877da931cd",
+      "name": "Send a message",
+      "webhookId": "eb2d8b3a-0817-4143-896f-dc1cba160cd9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Xo4RmTTn11Eyy3yo",
+          "name": "Gmail Connected !"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "llama-3.1-8b-instant",
+          "mode": "list",
+          "cachedResultName": "llama-3.1-8b-instant"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1984,
+        208
+      ],
+      "id": "8cad8fa2-50f9-4d1e-b92f-4b1e1c07ae8e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "aXa9m6XTanqETuAs",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        0
+      ],
+      "id": "9a40b2ff-45f3-4b13-b561-bda15ae8f87f",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "10HxWd27c0mRfrE0A5bTBz5SKU_SwstNd6Ea0XHIPdYk",
+          "mode": "list",
+          "cachedResultName": "Persona Users",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10HxWd27c0mRfrE0A5bTBz5SKU_SwstNd6Ea0XHIPdYk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10HxWd27c0mRfrE0A5bTBz5SKU_SwstNd6Ea0XHIPdYk/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2048,
+        0
+      ],
+      "id": "972a8db2-d197-41aa-aa34-4e12ff4e3715",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3YsRL8XBiE9FBxfB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4410e6dd-7943-43b4-ae6e-1a34d6b8e242",
+              "leftValue": "={{ Number($json.sendHour) }}",
+              "rightValue": "={{ $now.hour }}",
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "9a837868-92cd-4d39-b85e-af6bc4703867",
+              "leftValue": "={{ String($json.consent).toLowerCase() === 'true' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        2256,
+        0
+      ],
+      "id": "e2db2956-3d1a-44fa-9ca5-992f6285d3e4",
+      "name": "Filter1"
+    },
+    {
+      "parameters": {
+        "formTitle": "Se désabonner de Persona",
+        "formDescription": "Entrez votre e-mail pour ne plus recevoir la newsletter.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "email",
+              "fieldType": "email"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -64,
+        960
+      ],
+      "id": "96d997a9-5622-46d0-8a4c-3dffdcdb38ea",
+      "name": "On form submission",
+      "webhookId": "7563b672-5325-4bad-a636-391f23f2eb61"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "10HxWd27c0mRfrE0A5bTBz5SKU_SwstNd6Ea0XHIPdYk",
+          "mode": "list",
+          "cachedResultName": "Persona Users",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10HxWd27c0mRfrE0A5bTBz5SKU_SwstNd6Ea0XHIPdYk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10HxWd27c0mRfrE0A5bTBz5SKU_SwstNd6Ea0XHIPdYk/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "email",
+              "lookupValue": "={{ $json.email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        256,
+        960
+      ],
+      "id": "ced080d4-da41-4d8d-9263-eef06b1cb41e",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3YsRL8XBiE9FBxfB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "10HxWd27c0mRfrE0A5bTBz5SKU_SwstNd6Ea0XHIPdYk",
+          "mode": "list",
+          "cachedResultName": "Persona Users",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10HxWd27c0mRfrE0A5bTBz5SKU_SwstNd6Ea0XHIPdYk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10HxWd27c0mRfrE0A5bTBz5SKU_SwstNd6Ea0XHIPdYk/edit#gid=0"
+        },
+        "startIndex": "={{ $json.row_number }}"
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        656,
+        960
+      ],
+      "id": "78ff5d5f-e5a2-4383-8329-d7200b3082dc",
+      "name": "Delete rows or columns from sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3YsRL8XBiE9FBxfB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -32,
+        480
+      ],
+      "id": "acdf7bee-1d72-4f12-ba58-5d6f9018f587",
+      "name": "When chat message received",
+      "webhookId": "d4504bd4-4d12-4903-bc84-800072f858d2"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Tu es Persona, un assistant d'inscription à une newsletter personnalisée.\nTa mission : collecter dans la conversation, dans l'ordre :\n1. le prénom de l'utilisateur\n2. son adresse e-mail\n3. ses centres d'intérêt\n4. l'heure à laquelle il veut recevoir la newsletter (0-23)\n5. son consentement explicite pour stocker son e-mail (oui/non)\n\nQuand tu as TOUTES ces informations et que le consentement est oui,\nappelle l'outil save_user. Pour le champ consent, envoie TRUE.\nNe sauvegarde jamais sans consentement explicite.\nRéponds toujours en français, bref et amical.\n\nPour le champ consent de l'outil save_user, envoie exactement la valeur TRUE (en majuscules), jamais \"oui\".\n\nAprès avoir sauvegardé l'inscription avec succès, confirme à l'utilisateur\net informe-le en une phrase : il peut se désinscrire à tout moment via le\nlien présent dans chaque newsletter, et ses données seront alors supprimées.\n\nSi l'utilisateur demande comment se désinscrire ou supprimer ses données,\nexplique-lui : cliquer sur le lien \"se désabonner\" dans n'importe quelle\nnewsletter reçue, ou utiliser ce formulaire : [http://localhost:5678/form-test/7563b672-5325-4bad-a636-391f23f2eb61]\nLa suppression retire toutes ses données de notre base."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        176,
+        480
+      ],
+      "id": "6675d0ca-e696-4f72-ad3b-e5af38d655dc",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "llama-3.1-8b-instant",
+          "mode": "list",
+          "cachedResultName": "llama-3.1-8b-instant"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        48,
+        688
+      ],
+      "id": "d59de078-b92f-482b-ac2c-c7dff82890df",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "aXa9m6XTanqETuAs",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "10HxWd27c0mRfrE0A5bTBz5SKU_SwstNd6Ea0XHIPdYk",
+          "mode": "list",
+          "cachedResultName": "Persona Users",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10HxWd27c0mRfrE0A5bTBz5SKU_SwstNd6Ea0XHIPdYk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10HxWd27c0mRfrE0A5bTBz5SKU_SwstNd6Ea0XHIPdYk/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('name', ``, 'string') }}",
+            "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', ``, 'string') }}",
+            "interests": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('interests', ``, 'string') }}",
+            "sendHour": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('sendHour', ``, 'string') }}",
+            "consent": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('consent', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "interests",
+              "displayName": "interests",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sendHour",
+              "displayName": "sendHour",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "consent",
+              "displayName": "consent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        336,
+        656
+      ],
+      "id": "dfaf28cb-7c3f-4dfa-b93e-25e84ef3dbda",
+      "name": "Append row in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3YsRL8XBiE9FBxfB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        192,
+        688
+      ],
+      "id": "8791168f-8b0a-4764-9400-8f095a3f128b",
+      "name": "Simple Memory"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "RSS Read1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read1": {
+      "main": [
+        [
+          {
+            "node": "RSS Read2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Delete rows or columns from sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4fa4982b6b6c8515a275afd89c21fa269058ff0caa20cd4a48f3780255899669"
+  }
+}
