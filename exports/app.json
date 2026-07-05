@@ -567,6 +567,12 @@
                             "name": "username",
                             "value": "={{ $('Switch1').first().json.username }}",
                             "type": "string"
+                        },
+                        {
+                            "id": "07d8e27f-b044-4690-b2f6-bdca2402a926",
+                            "name": "subscribed",
+                            "value": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -646,7 +652,7 @@
             "parameters": {
                 "operation": "insert",
                 "collection": "session",
-                "fields": "username, password, sessionId, data",
+                "fields": "username, password, sessionId, data, subscribed",
                 "options": {}
             },
             "type": "n8n-nodes-base.mongoDb",
@@ -962,7 +968,8 @@
         {
             "parameters": {
                 "collection": "session",
-                "options": {}
+                "options": {},
+                "query": "={ \"subscribed\": true}"
             },
             "type": "n8n-nodes-base.mongoDb",
             "typeVersion": 1.3,
