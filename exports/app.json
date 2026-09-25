@@ -2,23 +2,27 @@
     "nodes": [
         {
             "parameters": {
-                "options": {}
+                "options": {
+                    "responseMode": "responseNodes"
+                }
             },
             "type": "@n8n/n8n-nodes-langchain.chatTrigger",
             "typeVersion": 1.4,
-            "position": [192, 48],
-            "id": "868693cc-cc85-4e4b-9421-7845e6a23077",
+            "position": [-688, 368],
+            "id": "7890e7f5-9a34-4bf8-a0a3-5813ea6d5706",
             "name": "When chat message received",
             "webhookId": "b5a25918-a16a-41b6-b492-832e49bf5feb"
         },
         {
             "parameters": {
+                "promptType": "define",
+                "text": "={{ $('When chat message received').first().json.chatInput }}",
                 "options": {}
             },
             "type": "@n8n/n8n-nodes-langchain.agent",
             "typeVersion": 3.1,
-            "position": [1280, 352],
-            "id": "4c8adf84-06fc-436b-9801-90025f7177c9",
+            "position": [656, 960],
+            "id": "60770468-ebab-48a3-a6cf-18a489ab7748",
             "name": "AI Agent"
         },
         {
@@ -28,13 +32,13 @@
             },
             "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
             "typeVersion": 1,
-            "position": [1088, 624],
-            "id": "15f63106-c26f-4b82-8a62-4d5bef997cfa",
+            "position": [736, 1184],
+            "id": "0127bc62-9c9a-440b-ad61-e8102194258d",
             "name": "Ollama Chat Model",
             "credentials": {
                 "ollamaApi": {
-                    "id": "T5d9w8lO3drHLyNj",
-                    "name": "Ollama account"
+                    "id": "ZEFEFW4Gz6HeK73O",
+                    "name": "Ollama account 2"
                 }
             }
         },
@@ -52,13 +56,105 @@
                                 },
                                 "conditions": [
                                     {
-                                        "leftValue": "",
-                                        "rightValue": "",
+                                        "leftValue": "={{ $json.state }}",
+                                        "rightValue": "new",
                                         "operator": {
                                             "type": "string",
                                             "operation": "equals"
                                         },
                                         "id": "184beb0e-ca3e-40d5-8d10-8330b310fb41"
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 3
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "0b798062-711b-451a-981e-fc121f353359",
+                                        "leftValue": "={{ $json.state }}",
+                                        "rightValue": "awaiting_username",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 3
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "801cefd0-f0f8-49b1-a7fd-0f632bab0d78",
+                                        "leftValue": "={{ $json.state }}",
+                                        "rightValue": "awaiting_password_login",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 3
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "278bf7ca-5645-42a3-ad74-2b3d28fe7774",
+                                        "leftValue": "={{ $json.state }}",
+                                        "rightValue": "awaiting_password_register",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 3
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "8f796902-4523-46a3-b81f-16581a13b987",
+                                        "leftValue": "={{ $json.state }}",
+                                        "rightValue": "authenticated",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
                                     }
                                 ],
                                 "combinator": "and"
@@ -70,19 +166,28 @@
             },
             "type": "n8n-nodes-base.switch",
             "typeVersion": 3.4,
-            "position": [944, -16],
-            "id": "dc63f234-16ab-4ac6-b3c6-5e0b8d40d2ae",
+            "position": [432, 320],
+            "id": "9c940437-9951-460e-96e9-ecf54681643f",
             "name": "Switch1"
         },
         {
             "parameters": {
-                "options": {}
+                "collection": "session",
+                "options": {},
+                "query": "={{ JSON.stringify({ sessionId: $('When chat message received').item.json.sessionId }) }}"
             },
             "type": "n8n-nodes-base.mongoDb",
             "typeVersion": 1.3,
-            "position": [496, 48],
-            "id": "92f28941-2f4b-4ddb-ac39-03b976754c7d",
-            "name": "Find documents"
+            "position": [-464, 368],
+            "id": "ee7c739b-a78a-4bb0-98f2-07d8541bd38d",
+            "name": "Find documents",
+            "alwaysOutputData": true,
+            "credentials": {
+                "mongoDb": {
+                    "id": "sFoDtMwVAu42mHWX",
+                    "name": "MongoDB account"
+                }
+            }
         },
         {
             "parameters": {
@@ -96,12 +201,12 @@
                     "conditions": [
                         {
                             "id": "0adf0b5a-b530-4af5-a6da-20fdb64e03a9",
-                            "leftValue": "",
+                            "leftValue": "={{ $json }}",
                             "rightValue": "",
                             "operator": {
-                                "type": "string",
-                                "operation": "equals",
-                                "name": "filter.operator.equals"
+                                "type": "object",
+                                "operation": "notEmpty",
+                                "singleValue": true
                             }
                         }
                     ],
@@ -111,9 +216,942 @@
             },
             "type": "n8n-nodes-base.if",
             "typeVersion": 2.3,
-            "position": [688, 16],
-            "id": "20892358-77fd-4de3-89c9-734b37207257",
+            "position": [-240, 368],
+            "id": "bcf42bad-8c50-40a4-83d7-c5547f26266e",
             "name": "If"
+        },
+        {
+            "parameters": {
+                "operation": "insert",
+                "collection": "session",
+                "fields": "sessionId,state",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.mongoDb",
+            "typeVersion": 1.3,
+            "position": [208, 448],
+            "id": "e9bef4e1-7318-4a68-a839-eb388486e16f",
+            "name": "Insert documents",
+            "credentials": {
+                "mongoDb": {
+                    "id": "sFoDtMwVAu42mHWX",
+                    "name": "MongoDB account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "{ \"output\": \"Bienvenue ! Vous n'avez pas encore de compte. Entrez votre nom d'utilisateur pour vous inscrire.\" }",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.5,
+            "position": [1232, -304],
+            "id": "27bf6cf3-a586-422e-8526-63680ff4fd8f",
+            "name": "Respond to Webhook"
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "{ \"output\": \"Utilisateur trouvé, veuillez insérer votre mot de passe.\" }",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.5,
+            "position": [1680, -112],
+            "id": "d7650685-8c67-44ac-a763-d83626dbc574",
+            "name": "Respond to Webhook1"
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "{ \"output\": \"Reconnexion réussie.\" }",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.5,
+            "position": [2096, 272],
+            "id": "e24d32e3-7299-49fd-b281-b6a57c713b7d",
+            "name": "Respond to Webhook2"
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "collection": "session",
+                "updateKey": "sessionId",
+                "fields": "state",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.mongoDb",
+            "typeVersion": 1.3,
+            "position": [1008, -304],
+            "id": "abdb9591-b384-46de-81ec-f1ee2a6631ed",
+            "name": "Update documents",
+            "credentials": {
+                "mongoDb": {
+                    "id": "sFoDtMwVAu42mHWX",
+                    "name": "MongoDB account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "collection": "session",
+                "updateKey": "sessionId",
+                "fields": "username,state",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.mongoDb",
+            "typeVersion": 1.3,
+            "position": [1456, -112],
+            "id": "2a42eb96-b385-445d-84b3-a65b71edc367",
+            "name": "Update documents1",
+            "credentials": {
+                "mongoDb": {
+                    "id": "sFoDtMwVAu42mHWX",
+                    "name": "MongoDB account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "collection": "session",
+                "updateKey": "sessionId",
+                "fields": "password, state",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.mongoDb",
+            "typeVersion": 1.3,
+            "position": [1872, 272],
+            "id": "7ecf34e3-f3d9-44ab-912a-17a9ee0c01a7",
+            "name": "Update documents2",
+            "credentials": {
+                "mongoDb": {
+                    "id": "sFoDtMwVAu42mHWX",
+                    "name": "MongoDB account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "05850afa-9a78-4354-a8d9-bcb40c57378e",
+                            "name": "sessionId",
+                            "value": "={{ $('When chat message received').first().json.sessionId }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "9eabc12d-3b32-437e-955c-81177b1273f9",
+                            "name": "state",
+                            "value": "new",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [-16, 448],
+            "id": "4e0e3a9c-d9b8-447d-a37a-966db378d4bd",
+            "name": "Edit Fields"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "8c8e8882-09e6-446d-b259-efd4e5dec5fb",
+                            "name": "sessionId",
+                            "value": "={{ $('When chat message received').first().json.sessionId }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "c5a976ad-9acb-4614-aa43-b5b8d81df4ff",
+                            "name": "state",
+                            "value": "awaiting_username",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [720, -304],
+            "id": "f1cbf38c-023c-4c5b-ac4a-25f98eae5ae2",
+            "name": "Edit Fields1"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "868eb3ae-fffd-4986-941c-0740fbcd5b36",
+                            "name": "sessionId",
+                            "value": "={{ $('When chat message received').first().json.sessionId }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "3dcab8d9-ff5c-4584-add5-fc8dff63d86b",
+                            "name": "username",
+                            "value": "={{ $('When chat message received').first().json.chatInput }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "7e822ac4-399e-49ad-aca7-f9a1416b967d",
+                            "name": "state",
+                            "value": "awaiting_password_login",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [1232, -112],
+            "id": "3b781613-d641-40af-b6de-054257bde50a",
+            "name": "Edit Fields2"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "1fb74640-727d-43e2-9125-ae3998c7819f",
+                            "name": "sessionId",
+                            "value": "={{ $('When chat message received').first().json.sessionId }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "59738bb0-f044-427e-80a3-e4e55a63ecc9",
+                            "name": "password",
+                            "value": "={{ $('When chat message received').first().json.chatInput + $json.data }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [1008, 368],
+            "id": "8ea90a5f-9acf-41f1-a2d0-28836b6153b8",
+            "name": "Edit Fields3"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 3
+                    },
+                    "conditions": [
+                        {
+                            "id": "cc431726-e23e-4fbf-b24e-267a16ba2194",
+                            "leftValue": "={{ $json }}",
+                            "rightValue": "",
+                            "operator": {
+                                "type": "object",
+                                "operation": "notEmpty",
+                                "singleValue": true
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "looseTypeValidation": "={{ false }}",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.3,
+            "position": [1008, -16],
+            "id": "42e87ccd-b3f8-4329-a163-60a71ca3c8e0",
+            "name": "If1"
+        },
+        {
+            "parameters": {
+                "collection": "session",
+                "options": {},
+                "query": "={{ JSON.stringify({ username: $('When chat message received').item.json.chatInput }) }}"
+            },
+            "type": "n8n-nodes-base.mongoDb",
+            "typeVersion": 1.3,
+            "position": [720, -16],
+            "id": "43dfd307-9822-4128-8fa2-1446e95bf99e",
+            "name": "Find documents1",
+            "alwaysOutputData": true,
+            "credentials": {
+                "mongoDb": {
+                    "id": "sFoDtMwVAu42mHWX",
+                    "name": "MongoDB account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "868eb3ae-fffd-4986-941c-0740fbcd5b36",
+                            "name": "sessionId",
+                            "value": "={{ $('When chat message received').first().json.sessionId }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "3dcab8d9-ff5c-4584-add5-fc8dff63d86b",
+                            "name": "username",
+                            "value": "={{ $('When chat message received').first().json.chatInput }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "7e822ac4-399e-49ad-aca7-f9a1416b967d",
+                            "name": "state",
+                            "value": "awaiting_password_register",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [1232, 80],
+            "id": "1a1468c9-d970-4dc0-b21f-ac3cafddc8b4",
+            "name": "Edit Fields4"
+        },
+        {
+            "parameters": {
+                "collection": "session",
+                "options": {},
+                "query": "={{ JSON.stringify ({ username : $('Switch1').first().json.username })}}"
+            },
+            "type": "n8n-nodes-base.mongoDb",
+            "typeVersion": 1.3,
+            "position": [720, 368],
+            "id": "d032d18d-76b0-400d-8523-59873dc9da72",
+            "name": "Find documents2",
+            "credentials": {
+                "mongoDb": {
+                    "id": "sFoDtMwVAu42mHWX",
+                    "name": "MongoDB account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "1b088aca-e5d0-447f-9877-f3d72d8db334",
+                            "name": "sessionId",
+                            "value": "={{ $('When chat message received').first().json.sessionId }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "8c8e8882-09e6-446d-b259-efd4e5dec5fb",
+                            "name": "password",
+                            "value": "={{ $('When chat message received').first().json.chatInput }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "c5a976ad-9acb-4614-aa43-b5b8d81df4ff",
+                            "name": "state",
+                            "value": "authenticated",
+                            "type": "string"
+                        },
+                        {
+                            "id": "078389e0-2302-4b64-a9d8-b2f62e2e50b5",
+                            "name": "username",
+                            "value": "={{ $('Switch1').first().json.username }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "07d8e27f-b044-4690-b2f6-bdca2402a926",
+                            "name": "subscribed",
+                            "value": true,
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [720, 656],
+            "id": "271a524e-efa2-4144-954e-194d6ba1cd28",
+            "name": "Edit Fields5"
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "collection": "session",
+                "updateKey": "sessionId",
+                "fields": "sessionId, username, state",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.mongoDb",
+            "typeVersion": 1.3,
+            "position": [1456, 80],
+            "id": "aaf5fe26-b2b7-4d7b-9599-c065f1c53e49",
+            "name": "Update documents3",
+            "credentials": {
+                "mongoDb": {
+                    "id": "sFoDtMwVAu42mHWX",
+                    "name": "MongoDB account"
+                }
+            },
+            "alwaysOutputData": true
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "{ \"output\": \"Choisissez un mot de passe pour votre compte.\" }",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.5,
+            "position": [1680, 80],
+            "id": "7c0cd807-796b-4358-9bb5-314511df7f0f",
+            "name": "Respond to Webhook3"
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "{ \"output\": \"Première connexion réussie, bienvenue.\" }",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.5,
+            "position": [2128, 656],
+            "id": "0a2151f3-e9d3-4d88-8e54-86691141c973",
+            "name": "Respond to Webhook4"
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "collection": "session",
+                "fields": "username, password, data, subscribed, state",
+                "options": {},
+                "updateKey": "sessionId"
+            },
+            "type": "n8n-nodes-base.mongoDb",
+            "typeVersion": 1.3,
+            "position": [1680, 656],
+            "id": "8fe357f2-7a50-4659-902e-1b6b3a172f49",
+            "name": "Insert documents1",
+            "credentials": {
+                "mongoDb": {
+                    "id": "sFoDtMwVAu42mHWX",
+                    "name": "MongoDB account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "action": "generate",
+                "encodingType": "hex",
+                "stringLength": 16
+            },
+            "type": "n8n-nodes-base.crypto",
+            "typeVersion": 2,
+            "position": [1008, 656],
+            "id": "4d624bdd-0e30-4d6a-b2d7-16641c673d11",
+            "name": "Crypto"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "83339b95-4656-4f9d-9ad0-d182fbd0a201",
+                            "name": "hash",
+                            "value": "=$json.password + $json.data",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {},
+                "includeOtherFields": true
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [1232, 656],
+            "id": "ef6145fb-d431-423a-9805-0423ca9545fa",
+            "name": "Edit Fields6"
+        },
+        {
+            "parameters": {
+                "value": "=$json.hash",
+                "dataPropertyName": "password"
+            },
+            "type": "n8n-nodes-base.crypto",
+            "typeVersion": 2,
+            "position": [1456, 656],
+            "id": "b0220c4e-b5ae-4623-9284-a17b132b89d1",
+            "name": "Crypto1"
+        },
+        {
+            "parameters": {
+                "value": "=$json.password",
+                "dataPropertyName": "password"
+            },
+            "type": "n8n-nodes-base.crypto",
+            "typeVersion": 2,
+            "position": [1232, 368],
+            "id": "b9f89283-c19e-4d61-b96c-77dcc626c8ea",
+            "name": "Crypto2"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 3
+                    },
+                    "conditions": [
+                        {
+                            "id": "ec6337c9-075f-4e84-90bd-16b118ed10da",
+                            "leftValue": "=$('Find documents2').item.json.password",
+                            "rightValue": "=$json.password",
+                            "operator": {
+                                "type": "string",
+                                "operation": "equals"
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.3,
+            "position": [1456, 368],
+            "id": "aa11bcec-4f8a-4737-9e91-ea88a60386ee",
+            "name": "If2"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "52e5fe9d-5fd7-47da-80bd-fbd34c25c440",
+                            "name": "state",
+                            "value": "awaiting_password_login",
+                            "type": "string"
+                        },
+                        {
+                            "id": "42b0e0a1-2276-43c9-88ee-3c1880ce8f92",
+                            "name": "sessionId",
+                            "value": "={{ $('When chat message received').first().json.sessionId }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [1680, 464],
+            "id": "13e00c3e-444e-42b2-bd21-e01260bc4612",
+            "name": "Edit Fields7"
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "collection": "session",
+                "updateKey": "sessionId",
+                "fields": "state",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.mongoDb",
+            "typeVersion": 1.3,
+            "position": [1904, 464],
+            "id": "2c5bf6c2-f24e-4bec-b382-113186a014cb",
+            "name": "Update documents5",
+            "credentials": {
+                "mongoDb": {
+                    "id": "sFoDtMwVAu42mHWX",
+                    "name": "MongoDB account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "{ \"output\": \"L'username ou le password est incorrect, veuillez ré-essayer.\" }",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.5,
+            "position": [2112, 464],
+            "id": "79078d38-3444-4714-b124-3a61873f1126",
+            "name": "Respond to Webhook5"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "0621e855-d66d-4ab6-bf12-b3e00d235432",
+                            "name": "state",
+                            "value": "authenticated",
+                            "type": "string"
+                        },
+                        {
+                            "id": "b6f914fc-5fa5-4cdc-8258-b6cc0e52ec6e",
+                            "name": "password",
+                            "value": "=$json.password",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [1680, 288],
+            "id": "bc685d7b-f313-4888-afdf-aacc1ec08bd0",
+            "name": "Edit Fields8"
+        },
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours"
+                        }
+                    ]
+                }
+            },
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.3,
+            "position": [-700, 2100],
+            "id": "709d780c-0b29-4e3e-b2a6-a18bfb4b89fe",
+            "name": "NL Schedule"
+        },
+        {
+            "parameters": {},
+            "type": "n8n-nodes-base.manualTrigger",
+            "typeVersion": 1,
+            "position": [-700, 2320],
+            "id": "8a12e950-d860-4d88-ab12-06d486156f55",
+            "name": "NL Manual"
+        },
+        {
+            "parameters": {
+                "url": "https://www.theguardian.com/environment/climate-crisis/rss",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.rssFeedRead",
+            "typeVersion": 1.2,
+            "position": [-460, 2000],
+            "id": "8c44e51e-8710-4eb0-8378-fe1dce8bab2d",
+            "name": "NL RSS Guardian"
+        },
+        {
+            "parameters": {
+                "url": "https://grist.org/feed/",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.rssFeedRead",
+            "typeVersion": 1.2,
+            "position": [-460, 2200],
+            "id": "4fd7951b-be6b-47c4-91bc-a7c27d519d52",
+            "name": "NL RSS Grist"
+        },
+        {
+            "parameters": {
+                "url": "https://insideclimatenews.org/feed/",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.rssFeedRead",
+            "typeVersion": 1.2,
+            "position": [-460, 2400],
+            "id": "7065de42-9e85-4df8-9fef-7aefee032000",
+            "name": "NL RSS Inside"
+        },
+        {
+            "parameters": {
+                "numberInputs": 3
+            },
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3.2,
+            "position": [-240, 2200],
+            "id": "9b76b8ea-0a33-4190-9e99-93b35b713ef9",
+            "name": "NL Merge"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "7181fbb9-85cd-48ae-8a27-f5d3b3c30627",
+                            "name": "title",
+                            "value": "={{ $json.title }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "e3523a34-7ad7-4982-a829-4b9ab3e6a5f8",
+                            "name": "link",
+                            "value": "={{ $json.link }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "22697ff3-2e3e-4f91-9094-dc67d98690f3",
+                            "name": "snippet",
+                            "value": "={{ ($json.contentSnippet || $json.content || '').slice(0, 200) }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "d2195ae3-1cb0-430c-8221-e4b6480540cd",
+                            "name": "date",
+                            "value": "={{ $json.isoDate || $json.pubDate }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [-20, 2200],
+            "id": "eb9f15e2-e636-4e35-b563-f9d0269cd0ce",
+            "name": "NL Normalize"
+        },
+        {
+            "parameters": {
+                "compare": "selectedFields",
+                "fieldsToCompare": "link",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.removeDuplicates",
+            "typeVersion": 2,
+            "position": [200, 2200],
+            "id": "01988211-40f7-4046-8a66-1e190cc22bfa",
+            "name": "NL Dedupe"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 3
+                    },
+                    "conditions": [
+                        {
+                            "id": "b4df852b-d04e-4940-bdeb-23b8a0b28622",
+                            "leftValue": "={{ new Date($json.date) > $now.minus({ days: 7 }).toJSDate() }}",
+                            "rightValue": "=",
+                            "operator": {
+                                "type": "boolean",
+                                "operation": "true",
+                                "singleValue": true
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.filter",
+            "typeVersion": 2.3,
+            "position": [420, 2200],
+            "id": "c4b057fa-381d-409c-967e-af45ca26abdb",
+            "name": "NL Filter Recent"
+        },
+        {
+            "parameters": {
+                "maxItems": 5
+            },
+            "type": "n8n-nodes-base.limit",
+            "typeVersion": 1,
+            "position": [640, 2200],
+            "id": "e056dca3-f65b-4d37-9d6e-0b5177a465b2",
+            "name": "NL Limit"
+        },
+        {
+            "parameters": {
+                "aggregate": "aggregateAllItemData",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [860, 2200],
+            "id": "384fa969-d9dc-4721-8349-243c7bccfa99",
+            "name": "NL Aggregate"
+        },
+        {
+            "parameters": {
+                "collection": "session",
+                "options": {},
+                "query": "={ \"subscribed\": true }"
+            },
+            "type": "n8n-nodes-base.mongoDb",
+            "typeVersion": 1.1,
+            "position": [1080, 2200],
+            "id": "02a9ba62-3c75-4b3e-9ded-b59298e00ff8",
+            "name": "NL Find Subscribers",
+            "credentials": {
+                "mongoDb": {
+                    "id": "sFoDtMwVAu42mHWX",
+                    "name": "MongoDB account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "loose",
+                        "version": 3
+                    },
+                    "conditions": [
+                        {
+                            "id": "8ed677ff-81a1-42ea-8c44-e2b8184880b2",
+                            "leftValue": "={{ new Date($json.lastSentAt || 0) <= $now.minus({ days: ($json.frequency || 1) }).toJSDate() }}",
+                            "rightValue": "",
+                            "operator": {
+                                "type": "boolean",
+                                "operation": "true",
+                                "singleValue": true
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.filter",
+            "typeVersion": 2.2,
+            "position": [1300, 2200],
+            "id": "63e5e1d9-0433-4ed2-9ab3-a175f703d30a",
+            "name": "NL Filter Due"
+        },
+        {
+            "parameters": {
+                "promptType": "=define",
+                "text": "=Tu es un curateur de veille climatique. Le lecteur s'intéresse à : {{ $json.interests }}\n\nVoici les articles du jour au format JSON :\n{{ JSON.stringify($('NL Aggregate').first().json.data) }}\n\nSélectionne les 5 articles les plus pertinents pour ce lecteur.\n\nRéponds UNIQUEMENT avec un tableau JSON valide, sans texte avant ou après, sans balises markdown, au format exact :\n[{\"title\": \"titre de l'article\", \"link\": \"url exacte fournie\", \"summary\": \"résumé en une phrase courte (20 mots maximum)\"}]\n\nImportant : recopie les liens exactement tels qu'ils sont fournis, ne les modifie jamais. N'invente aucun article.",
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.9,
+            "position": [1560, 2200],
+            "id": "97b24125-be8a-4c7a-8751-488ed9dc9474",
+            "name": "NL LLM Curate"
+        },
+        {
+            "parameters": {
+                "jsCode": "const users = $('NL Filter Due').all();\nconst results = [];\nlet i = 0;\n\nfor (const item of $input.all()) {\n  const raw = item.json.text || \"\";\n  let clean = raw.replace(/```json/g, \"\").replace(/```/g, \"\").trim();\n\n  // keep only from first [ to last ]\n  const start = clean.indexOf(\"[\");\n  const end = clean.lastIndexOf(\"]\");\n  if (start !== -1 && end !== -1 && end > start) {\n    clean = clean.slice(start, end + 1);\n  } else if (start !== -1) {\n    clean = clean.slice(start);\n  }\n\n  let articles = null;\n  try {\n    articles = JSON.parse(clean);\n  } catch (e) {\n    // fallback: truncated JSON -> close after last complete object\n    const lastBrace = clean.lastIndexOf(\"}\");\n    if (lastBrace !== -1) {\n      try {\n        articles = JSON.parse(clean.slice(0, lastBrace + 1) + \"]\");\n      } catch (e2) {\n        articles = null;\n      }\n    }\n  }\n\n  // skip this user if LLM output is unusable (don't crash the others)\n  if (!articles || !Array.isArray(articles) || articles.length === 0) {\n    i++;\n    continue;\n  }\n\n  const articlesHtml = articles.map(a =>\n    \"<div style='margin-bottom:20px'>\"\n    + \"<h3 style='margin-bottom:4px'>\" + (a.title || \"\") + \"</h3>\"\n    + \"<p style='margin:4px 0'>\" + (a.summary || \"\") + \"</p>\"\n    + \"<a href='\" + (a.link || \"#\") + \"'>Lire l'article</a>\"\n    + \"</div>\"\n  ).join(\"\");\n\n  const html = \"<h1>Votre veille climat du jour</h1>\"\n    + articlesHtml\n    + \"<hr>\"\n    + \"<p style='color:gray;font-size:12px'>Vous recevez cet email car vous êtes inscrit à Persona. \"\n    + \"<a href='http://localhost:5678/form/7563b672-5325-4bad-a636-391f23f2eb61'>Cliquez ici pour vous désabonner</a>.</p>\";\n\n  results.push({\n    json: {\n      html: html,\n      email: users[i] ? users[i].json.email : undefined,\n      sessionId: users[i] ? users[i].json.sessionId : undefined\n    }\n  });\n\n  i++;\n}\n\nreturn results;"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [1780, 2200],
+            "id": "b71066be-4c3d-4d9f-b067-5fff05ec7bdf",
+            "name": "NL Format HTML"
+        },
+        {
+            "parameters": {
+                "fromEmail": "razigue.benhmida@epitech.eu",
+                "toEmail": "={{ $json.email }}",
+                "subject": "=Persona · Votre veille du {{ $now.format('dd/MM') }}",
+                "html": "={{ $json.html }}",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.emailSend",
+            "typeVersion": 2.1,
+            "position": [2000, 2200],
+            "id": "0f797c49-7092-4e8c-8582-45c712c06926",
+            "name": "NL Send Email",
+            "credentials": {
+                "smtp": {
+                    "id": "YiI36cS4BdBeSxjK",
+                    "name": "SMTP account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "d29527ee-9609-4731-ab60-225d6b979131",
+                            "name": "sessionId",
+                            "value": "={{ $json.sessionId }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "127529ce-eed5-4754-86e4-bec6190d1a38",
+                            "name": "lastSentAt",
+                            "value": "={{ $now.toISO() }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [2000, 2400],
+            "id": "34f6beba-b47d-4c62-b7a7-b18b6d8f7569",
+            "name": "NL Stamp Date"
+        },
+        {
+            "parameters": {
+                "operation": "update",
+                "collection": "session",
+                "updateKey": "sessionId",
+                "fields": "sessionId, lastSentAt",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.mongoDb",
+            "typeVersion": 1.1,
+            "position": [2220, 2200],
+            "id": "fe28ef8d-3478-45d7-acf1-ede331076726",
+            "name": "NL Mark Sent",
+            "credentials": {
+                "mongoDb": {
+                    "id": "sFoDtMwVAu42mHWX",
+                    "name": "MongoDB account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "model": {
+                    "__rl": true,
+                    "value": "llama-3.1-8b-instant",
+                    "mode": "list",
+                    "cachedResultName": "llama-3.1-8b-instant"
+                },
+                "builtInTools": {},
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+            "typeVersion": 1.3,
+            "position": [1560, 2420],
+            "id": "97aef9e6-20dc-432d-8e6f-319ee22e824f",
+            "name": "NL OpenAI Model",
+            "credentials": {
+                "openAiApi": {
+                    "id": "aXa9m6XTanqETuAs",
+                    "name": "OpenAI account"
+                }
+            }
         }
     ],
     "connections": {
@@ -143,6 +1181,34 @@
             "main": [
                 [
                     {
+                        "node": "Edit Fields1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Find documents1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Find documents2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Edit Fields5",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
                         "node": "AI Agent",
                         "type": "main",
                         "index": 0
@@ -169,13 +1235,504 @@
                         "type": "main",
                         "index": 0
                     }
+                ],
+                [
+                    {
+                        "node": "Edit Fields",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Insert documents": {
+            "main": [
+                [
+                    {
+                        "node": "Switch1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Update documents": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Update documents1": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Update documents2": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields": {
+            "main": [
+                [
+                    {
+                        "node": "Insert documents",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields1": {
+            "main": [
+                [
+                    {
+                        "node": "Update documents",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields2": {
+            "main": [
+                [
+                    {
+                        "node": "Update documents1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields3": {
+            "main": [
+                [
+                    {
+                        "node": "Crypto2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "If1": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Edit Fields4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Find documents1": {
+            "main": [
+                [
+                    {
+                        "node": "If1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields4": {
+            "main": [
+                [
+                    {
+                        "node": "Update documents3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Find documents2": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields5": {
+            "main": [
+                [
+                    {
+                        "node": "Crypto",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Update documents3": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Insert documents1": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Crypto": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields6",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields6": {
+            "main": [
+                [
+                    {
+                        "node": "Crypto1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Crypto1": {
+            "main": [
+                [
+                    {
+                        "node": "Insert documents1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Crypto2": {
+            "main": [
+                [
+                    {
+                        "node": "If2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "If2": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields8",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Edit Fields7",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields7": {
+            "main": [
+                [
+                    {
+                        "node": "Update documents5",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Update documents5": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook5",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields8": {
+            "main": [
+                [
+                    {
+                        "node": "Update documents2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Schedule": {
+            "main": [
+                [
+                    {
+                        "node": "NL RSS Guardian",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "NL RSS Grist",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "NL RSS Inside",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Manual": {
+            "main": [
+                [
+                    {
+                        "node": "NL RSS Guardian",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "NL RSS Grist",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "NL RSS Inside",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL RSS Guardian": {
+            "main": [
+                [
+                    {
+                        "node": "NL Merge",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL RSS Grist": {
+            "main": [
+                [
+                    {
+                        "node": "NL Merge",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "NL RSS Inside": {
+            "main": [
+                [
+                    {
+                        "node": "NL Merge",
+                        "type": "main",
+                        "index": 2
+                    }
+                ]
+            ]
+        },
+        "NL Merge": {
+            "main": [
+                [
+                    {
+                        "node": "NL Normalize",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Normalize": {
+            "main": [
+                [
+                    {
+                        "node": "NL Dedupe",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Dedupe": {
+            "main": [
+                [
+                    {
+                        "node": "NL Filter Recent",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Filter Recent": {
+            "main": [
+                [
+                    {
+                        "node": "NL Limit",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Limit": {
+            "main": [
+                [
+                    {
+                        "node": "NL Aggregate",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Aggregate": {
+            "main": [
+                [
+                    {
+                        "node": "NL Find Subscribers",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Find Subscribers": {
+            "main": [
+                [
+                    {
+                        "node": "NL Filter Due",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Filter Due": {
+            "main": [
+                [
+                    {
+                        "node": "NL LLM Curate",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL LLM Curate": {
+            "main": [
+                [
+                    {
+                        "node": "NL Format HTML",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Format HTML": {
+            "main": [
+                [
+                    {
+                        "node": "NL Send Email",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Send Email": {
+            "main": [
+                [
+                    {
+                        "node": "NL Stamp Date",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL Stamp Date": {
+            "main": [
+                [
+                    {
+                        "node": "NL Mark Sent",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NL OpenAI Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "NL LLM Curate",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
                 ]
             ]
         }
     },
     "pinData": {},
     "meta": {
-        "templateCredsSetupCompleted": true,
-        "instanceId": "7727bd471894d362e4b20e79a568c8752d0fb0f0e73ff5c0e08a2fceca6958ed"
+        "instanceId": "6ef3549744504582168946d8408ddd1b52c32d4ca1781f6da9b79092c8768346"
     }
 }
